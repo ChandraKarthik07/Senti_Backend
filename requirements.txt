@@ -7,6 +7,6 @@ pytz==2022.7
 Requests==2.31.0
 daphne==3.0.2
 whitenoise==5.3.0
-djangocorsheaders==3.8.0
+djangocorsheaders
 corsheaders==3.10.1
-```
+

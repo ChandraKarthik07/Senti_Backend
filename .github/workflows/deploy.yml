@@ -1,0 +1,32 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches:
+      - rspi
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configuring tailscale on the runner
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: kyJWF63CNTRL
+          oauth-secret: tskey-client-kyJWF63CNTRL-zTkcZ8LJJXj17Dk6uXVaWjHkgDvyetTXF
+          tags: tag:ci
+          
+      - name: SSH into Raspberry Pi and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: 100.100.151.14
+          username: sasi
+          password: 7122
+          script: |
+            cd /home/sasi/Senti-Backend
+            git pull origin main
+          
+
+
+
