@@ -2,5 +2,5 @@
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("Hello, sasi")
+    return HttpResponse("Hello, karthik")
 
