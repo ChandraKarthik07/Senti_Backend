@@ -88,7 +88,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-ROOT_URLCONF = "sentilytics.urls"
+ROOT_URLCONF = "Senti_Backend.urls"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:3000',
