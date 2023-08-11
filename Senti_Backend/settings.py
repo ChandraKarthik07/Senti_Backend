@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-j93tokj*)qs+c!6%6dom1$))p&qm5f3r=ct(d0hht=g-i*@otp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -94,6 +94,7 @@ ROOT_URLCONF = "Senti_Backend.urls"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:3000',
+  'http://0.0.0.0:8001',
 )
 ALLOWED_HOSTS=["*"]
 
