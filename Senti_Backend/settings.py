@@ -77,6 +77,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "Senti_Backend.wsgi.application"
+
+# ASGI_APPLICATION = "Senti_Backend.asgi.application"
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
