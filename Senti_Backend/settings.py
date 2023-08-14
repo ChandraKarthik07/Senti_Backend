@@ -59,6 +59,7 @@ MIDDLEWARE = [
     
 ]
 ROOT_URLCONF = "Senti_Backend.urls"
+AUTH_USER_MODEL = "core.User"
 
 TEMPLATES = [
     {
@@ -107,7 +108,8 @@ DATABASES = {
         'NAME': 'sentireplica',       # Replace with your actual database name
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
-        'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        'HOST':'100.100.151.14',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
