@@ -14,7 +14,8 @@ def home(request):
 class ChannelInfoAPIView(APIView):
     def get(self, request, channel_id, format=None):
         try:
-            channel = Channels.objects.get(channel_id=channel_id)
+            channel = Channels.objects.get(scan_id=channel_id)
+            print(channel)
             channel_serializer = ChannelSerializer(channel)
             videos = channel.videos_set.all()
             videos_serializer = VideoSerializer(videos, many=True)
