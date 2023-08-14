@@ -13,12 +13,16 @@ class CustomUserManager(UserManager):
     pass
 
 class User(AbstractUser):
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$', message="Phone number must be entered in the form of +919999999999.")
-    phone_number = models.CharField(validators=[phone_regex], max_length=15)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    email=models.EmailField(unique=True)
+    # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$', message="Phone number must be entered in the form of +919999999999.")
+    # phone_number = models.CharField(validators=[phone_regex], max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
-    otp = models.CharField(max_length=6, null=True, blank=True)
+    # otp = models.CharField(max_length=6, null=True, blank=True)
 
     objects = CustomUserManager()
+    USERNAME_FIELD="email"
+    REQUIRED_FIELDS=[]
 
     def __str__(self):
         return f"{self.username}-{self.id}"
