@@ -56,6 +56,23 @@ class Channels(models.Model):
                     models.UniqueConstraint(fields=['channel_id'], name='unique_channel_id')
                 ]
 
+class Videos(models.Model):
+    channel = models.ForeignKey(Channels, on_delete=models.DO_NOTHING,to_field='channel_id')
+    vid_id = models.CharField(max_length=255, primary_key=True)
+    vid_title = models.CharField(max_length=255, blank=True, null=True)
+    vid_view_cnt = models.IntegerField(blank=True, null=True)
+    vid_like_cnt = models.IntegerField(blank=True, null=True)
+    vid_comment_cnt = models.IntegerField(blank=True, null=True)
+    vid_url = models.CharField(max_length=255, blank=True, null=True)
+    vid_desc = models.TextField(blank=True, null=True)
+    vid_duration = models.CharField(max_length=255, blank=True, null=True)
+    vid_published_at = models.TextField(blank=True, null=True)
+    vid_thumbnail = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Videos'
+
 class CommentsSentimentanalysis(models.Model):
     id=models.BigAutoField(primary_key=True)
     vid = models.ForeignKey('Videos', models.DO_NOTHING)  # The composite primary key (vid_id, comment_id) found, that is not supported. The first column is selected.
@@ -145,20 +162,3 @@ class VideoRankings(models.Model):
         unique_together = (('vid', 'keyword', 'results_vidid'),)
 
 
-class Videos(models.Model):
-    channel = models.ForeignKey(Channels, models.DO_NOTHING)  # The composite primary key (channel_id, vid_id) found, that is not supported. The first column is selected.
-    vid_id = models.CharField(max_length=255,primary_key = True)
-    vid_title = models.CharField(max_length=255, blank=True, null=True)
-    vid_view_cnt = models.IntegerField(blank=True, null=True)
-    vid_like_cnt = models.IntegerField(blank=True, null=True)
-    vid_comment_cnt = models.IntegerField(blank=True, null=True)
-    vid_url = models.CharField(max_length=255, blank=True, null=True)
-    vid_desc = models.TextField(blank=True, null=True)
-    vid_duration = models.CharField(max_length=255, blank=True, null=True)
-    vid_published_at = models.TextField(blank=True, null=True)
-    vid_thumbnail = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'Videos'
-        # unique_together = (('channel', 'vid_id'),)
