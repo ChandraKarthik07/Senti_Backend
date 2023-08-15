@@ -32,15 +32,15 @@ class User(AbstractUser):
 User._meta.get_field('groups').remote_field.related_name = 'user_replica_groups'
 User._meta.get_field('user_permissions').remote_field.related_name = 'user_replica_permissions'
 
-# class ScanTable(models.Model):
-#     scan_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     scan_date_time = models.DateTimeField(default=timezone.now)
-#     scan_channel = models.CharField(max_length=255, default=None, null=True, blank=True)
+class ScanTable(models.Model):
+    scan_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    scan_date_time = models.DateTimeField(default=timezone.now)
+    scan_channel = models.CharField(max_length=255, default=None, null=True, blank=True)
 
 
 class Channels(models.Model):
-    scan_id = models.CharField(primary_key=True, max_length=255)  # The composite primary key (scan_id, channel_id) found, that is not supported. The first column is selected.
+    scan_id = models.OneToOneField(ScanTable,primary_key=True,on_delete=models.DO_NOTHING)  # The composite primary key (scan_id, channel_id) found, that is not supported. The first column is selected.
     channel_id = models.CharField(max_length=255)
     channel_title = models.CharField(max_length=255, blank=True, null=True)
     channel_description = models.TextField(blank=True, null=True)

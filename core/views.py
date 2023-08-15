@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.db.models import Prefetch
 from rest_framework import status
-from .models import Channels, Videos
+from .models import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,7 +14,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+import uuid
+from .tests import scrape_channel
 from .serializers import  *
 from rest_framework_simplejwt.views import TokenObtainPairView
 def home(request):
@@ -45,7 +46,40 @@ class UserSignupView(APIView):
             return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+class GenerateScanView(APIView):
+    def get(self, request):
+        # Get user_uuid and channel_name from query parameters
+        user_uuid = request.GET.get("user_uuid")
+        channel_name = request.GET.get("channel_name")
+
+        # Check if user_uuid and channel_name are provided
+        if not user_uuid or not channel_name:
+            return Response({"error": "user_uuid and channel_name are required."}, status=400)
+
+        try:
+            # Get the User instance using the provided user_uuid
+            user = User.objects.get(id=user_uuid)
+        except User.DoesNotExist:
+            return Response({"error": "User not found with the provided user_uuid."}, status=404)
+
+        # Generate a scan_id UUID
+        scan_id = uuid.uuid4()
+
+        # Create a new ScanTable entry
+        scan_entry = ScanTable.objects.create(
+            scan_id=scan_id,
+            user=user,  # Assign the User instance
+            scan_channel=channel_name,
+            scan_date_time=timezone.now()
+        )
+
+        response_data = {
+            "scan_id": scan_id
+        }
+        scrape_channel(channel_name, scan_id)
+        return Response(response_data)   
+
+
 class ChannelInfoAPIView(APIView):
     def get(self, request, channel_id, format=None):
         try:
