@@ -13,8 +13,9 @@ class CustomUserManager(UserManager):
     pass
 
 class User(AbstractUser):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     email=models.EmailField(unique=True)
+    username = models.CharField(max_length=255, unique=True, blank=True, null=True)
     # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$', message="Phone number must be entered in the form of +919999999999.")
     # phone_number = models.CharField(validators=[phone_regex], max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -25,22 +26,26 @@ class User(AbstractUser):
     REQUIRED_FIELDS=[]
 
     def __str__(self):
-        return f"{self.username}-{self.id}"
+        return f"{self.username}-{self.uuid}"
     class meta:
         db_table = 'User'
+    def save(self, *args, **kwargs):
+        if not self.uuid:
+            self.uuid = uuid.uuid4()
+        super().save(*args, **kwargs)
 
 User._meta.get_field('groups').remote_field.related_name = 'user_replica_groups'
 User._meta.get_field('user_permissions').remote_field.related_name = 'user_replica_permissions'
 
 class ScanTable(models.Model):
-    scan_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    scan_id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False,max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     scan_date_time = models.DateTimeField(default=timezone.now)
     scan_channel = models.CharField(max_length=255, default=None, null=True, blank=True)
 
 
 class Channels(models.Model):
-    scan_id = models.OneToOneField(ScanTable,primary_key=True,on_delete=models.DO_NOTHING)  # The composite primary key (scan_id, channel_id) found, that is not supported. The first column is selected.
+    scan = models.OneToOneField(ScanTable,primary_key=True,on_delete=models.DO_NOTHING)  # The composite primary key (scan_id, channel_id) found, that is not supported. The first column is selected.
     channel_id = models.CharField(max_length=255)
     channel_title = models.CharField(max_length=255, blank=True, null=True)
     channel_description = models.TextField(blank=True, null=True)

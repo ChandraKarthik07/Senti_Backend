@@ -14,9 +14,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-import uuid
+import uuid,hashlib
 from .tests import scrape_channel
 from .serializers import  *
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 def home(request):
     return HttpResponse("Hello, karthik")
@@ -58,25 +59,26 @@ class GenerateScanView(APIView):
 
         try:
             # Get the User instance using the provided user_uuid
-            user = User.objects.get(id=user_uuid)
+            user = User.objects.get(uuid=user_uuid)
         except User.DoesNotExist:
             return Response({"error": "User not found with the provided user_uuid."}, status=404)
 
         # Generate a scan_id UUID
-        scan_id = uuid.uuid4()
+        text_to_hash = channel_name+str(timezone.now())
+        hashed_value = hashlib.sha256(text_to_hash.encode()).hexdigest()
 
         # Create a new ScanTable entry
         scan_entry = ScanTable.objects.create(
-            scan_id=scan_id,
+            scan_id=hashed_value,
             user=user,  # Assign the User instance
             scan_channel=channel_name,
             scan_date_time=timezone.now()
         )
 
         response_data = {
-            "scan_id": scan_id
+            "scan_id": hashed_value
         }
-        scrape_channel(channel_name, scan_id)
+        scrape_channel(channel_name, hashed_value)
         return Response(response_data)   
 
 
