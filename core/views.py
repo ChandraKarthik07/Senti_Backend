@@ -49,6 +49,7 @@ class UserSignupView(APIView):
             return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 class GenerateScanView(APIView):
     def get(self, request):
         # Get user_uuid and channel_name from query parameters
@@ -61,7 +62,7 @@ class GenerateScanView(APIView):
 
         try:
             # Get the User instance using the provided user_uuid
-            user = User.objects.get(uuid=user_uuid)
+            user = User.objects.get(id=user_uuid)
         except User.DoesNotExist:
             return Response({"error": "User not found with the provided user_uuid."}, status=404)
 

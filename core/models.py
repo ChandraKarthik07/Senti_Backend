@@ -26,7 +26,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS=[]
 
     def __str__(self):
-        return f"{self.username}-{self.uuid}"
+        return f"{self.username}-{self.id}"
     class meta:
         db_table = 'User'
 
