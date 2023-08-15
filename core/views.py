@@ -69,7 +69,7 @@ class GenerateScanView(APIView):
         # Generate a scan_id UUID
         k=timezone.now()
         text_to_hash = channel_name+str(k)
-        hashed_value = hashlib.sha256(text_to_hash.encode()).hexdigest()
+        hashed_value = hashlib.sha256(text_to_hash.encode()).hexdigest()[:8]
 
         # Create a new ScanTable entry
         scan_entry = ScanTable.objects.create(
