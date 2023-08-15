@@ -13,7 +13,7 @@ class CustomUserManager(UserManager):
     pass
 
 class User(AbstractUser):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     email=models.EmailField(unique=True)
     username = models.CharField(max_length=255, unique=True, blank=True, null=True)
     # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$', message="Phone number must be entered in the form of +919999999999.")
@@ -29,10 +29,7 @@ class User(AbstractUser):
         return f"{self.username}-{self.uuid}"
     class meta:
         db_table = 'User'
-    def save(self, *args, **kwargs):
-        if not self.uuid:
-            self.uuid = uuid.uuid4()
-        super().save(*args, **kwargs)
+
 
 User._meta.get_field('groups').remote_field.related_name = 'user_replica_groups'
 User._meta.get_field('user_permissions').remote_field.related_name = 'user_replica_permissions'

@@ -17,8 +17,10 @@ from django.views.decorators.csrf import csrf_exempt
 import uuid,hashlib
 from .tests import scrape_channel
 from .serializers import  *
-
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import get_user_model
+User=get_user_model()
+
 def home(request):
     return HttpResponse("Hello, karthik")
 
