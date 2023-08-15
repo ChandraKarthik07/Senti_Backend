@@ -64,7 +64,8 @@ class GenerateScanView(APIView):
             return Response({"error": "User not found with the provided user_uuid."}, status=404)
 
         # Generate a scan_id UUID
-        text_to_hash = channel_name+str(timezone.now())
+        k=timezone.now()
+        text_to_hash = channel_name+str(k)
         hashed_value = hashlib.sha256(text_to_hash.encode()).hexdigest()
 
         # Create a new ScanTable entry
@@ -72,7 +73,7 @@ class GenerateScanView(APIView):
             scan_id=hashed_value,
             user=user,  # Assign the User instance
             scan_channel=channel_name,
-            scan_date_time=timezone.now()
+            scan_date_time=k
         )
 
         response_data = {
