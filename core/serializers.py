@@ -30,12 +30,3 @@ class ChannelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MonthlyStatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Monthlystats
-        fields = '__all__'
-
-class VideoStatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Videostats
-        fields = '__all__'
