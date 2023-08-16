@@ -8,6 +8,7 @@ from django.utils import timezone
 import uuid
 import pytz
 # from viewflow.fields import CompositeKey
+from oauth2_provider.models import AbstractApplication
 
 class CustomUserManager(UserManager):
     pass
@@ -22,8 +23,8 @@ class User(AbstractUser):
     # otp = models.CharField(max_length=6, null=True, blank=True)
 
     objects = CustomUserManager()
-    USERNAME_FIELD="email"
-    REQUIRED_FIELDS=[]
+    # USERNAME_FIELD="email"
+    # REQUIRED_FIELDS=[]
 
     def __str__(self):
         return f"{self.username}-{self.id}"
@@ -40,7 +41,8 @@ class ScanTable(models.Model):
     scan_date_time = models.DateTimeField(default=timezone.now)
     scan_channel = models.CharField(max_length=255, default=None, null=True, blank=True)
 
-
+class CustomApplication(AbstractApplication):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 class Channels(models.Model):
     scan = models.OneToOneField(ScanTable,primary_key=True,on_delete=models.DO_NOTHING)  # The composite primary key (scan_id, channel_id) found, that is not supported. The first column is selected.
     channel_id = models.CharField(max_length=255)

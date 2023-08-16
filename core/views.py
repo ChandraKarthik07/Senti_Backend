@@ -106,6 +106,10 @@ class ChannelInfoAPIView(APIView):
 
 
 
+class VideoStats(APIView):
+    def get(self,request):
+        scan_id=request.GET.get("scan_id")
+        
 
 
 
