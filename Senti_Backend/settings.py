@@ -121,7 +121,7 @@ DATABASES = {
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
-
+ALLOWED_PROVIDERS = ["google"]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
