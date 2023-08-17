@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+
 from pathlib import Path
 from datetime import timedelta
 
@@ -43,8 +44,10 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "whitenoise.runserver_nostatic",
     "rest_framework",
-
-]
+    'oauth2_provider',
+    'social_django',
+    'drf_social_oauth2',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -74,6 +77,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'social_django.context_processors.backends', #add
+                'social_django.context_processors.login_redirect', #add
             ],
         },
     },
@@ -93,6 +98,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
 ROOT_URLCONF = "Senti_Backend.urls"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
@@ -111,14 +117,18 @@ DATABASES = {
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
         # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
-        'HOST':'100.100.151.14',
+        'HOST':'0.0.0.0',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
-
+ALLOWED_PROVIDERS = ["google"]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
+
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+
         # Other authentication classes if needed
     ],
     'DEFAULT_RENDERER_CLASSES': [
@@ -132,8 +142,25 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
 }
 
+AUTHENTICATION_BACKENDS = (
+    # drf-social-oauth2
+    'social_core.backends.google.GoogleOAuth2',
 
+    'drf_social_oauth2.backends.DjangoOAuth2',
+
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
 # CSRF_FAILURE_VIEW = 'core.views.csrf_failure_view'  # Customize the view for CSRF failure
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY="746589599140-aio6e52g7s6gj09tc4en8gbvouc1oonj.apps.googleusercontent.com"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET="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"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
