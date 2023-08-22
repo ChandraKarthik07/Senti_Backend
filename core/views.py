@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import uuid,hashlib
-from .tests import scrape_channel
+from .tests import *
 from .serializers import  *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
@@ -88,9 +88,9 @@ class GenerateScanView(APIView):
 
 
 class ChannelInfoAPIView(APIView):
-    def get(self, request, channel_id, format=None):
+    def get(self, request, scan_id, format=None):
         try:
-            channel = Channels.objects.get(scan_id=channel_id)
+            channel = Channels.objects.get(scan_id=scan_id)
             print(channel)
             channel_serializer = ChannelSerializer(channel)
             videos = channel.videos_set.all()
@@ -106,10 +106,27 @@ class ChannelInfoAPIView(APIView):
             return Response({"error": "Channel not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+class MonthlyStatsAPIView(APIView):
+    def get(self, request, scan_id):
+        try:
+            monthly_stats = Monthlystats.objects.filter(channel__scan_id=scan_id)
+            serializer = MonthlystatsSerializer(monthly_stats, many=True)
+            ready_to_plot = process_data(serializer.data)
+            return Response(ready_to_plot)
+        except Monthlystats.DoesNotExist:
+            return Response({"message": "Monthly stats not found for the given scan_id."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class VideoStats(APIView):
-    def get(self,request):
-        scan_id=request.GET.get("scan_id")
-
-
-
+        
+class VideoStatsAPIView(APIView):
+    def get(self, request, scan_id):
+        try:
+            videostats = Videostats.objects.filter(channel__scan_id=scan_id)
+            serializer = VideoStatsSerializer(videostats, many=True)
+            # ready_to_plot=process_videostats(serializer.data)
+            return Response(serializer.data)
+        except Videostats.DoesNotExist:
+            return Response({"message": "Video stats not found for the given scan_id."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

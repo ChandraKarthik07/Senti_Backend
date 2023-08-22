@@ -41,7 +41,7 @@ class CustomApplication(AbstractApplication):
 
 
 class scanTable(models.Model):
-    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    user=models.ForeignKey(User, on_delete=models.CASCADE,to_field='id')
     scan_id=models.CharField(primary_key=True, max_length=255)
     channel_name=models.CharField(max_length=255, blank=True, null=True)
     scan_date=models.CharField(max_length=255)

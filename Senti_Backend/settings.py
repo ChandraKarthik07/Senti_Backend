@@ -116,12 +116,13 @@ DATABASES = {
         'NAME': 'sentireplica',       # Replace with your actual database name
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
-        # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
-        'HOST':'0.0.0.0',
+        'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        # 'HOST':'0.0.0.0',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
-ALLOWED_PROVIDERS = ["google"]
+ALLOWED_PROVIDERS = ["*"]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -144,7 +145,8 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = (
     # drf-social-oauth2
-    'social_core.backends.google.GoogleOAuth2',
+    # 'social_core.backends.google.GoogleOAuth2',
+    'drf_social_oauth2.backends.GoogleIdentityBackend',
 
     'drf_social_oauth2.backends.DjangoOAuth2',
 
@@ -160,7 +162,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET="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"
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
+
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
