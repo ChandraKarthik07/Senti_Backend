@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_social_oauth2',
     ]
 
+
 MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django.middleware.security.SecurityMiddleware",
@@ -61,8 +62,22 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
     
 ]
+
+# SOCIAL_AUTH_PIPELINE = (
+#     'social_core.pipeline.social_auth.social_details',
+#     'social_core.pipeline.social_auth.social_uid',
+#     'social_core.pipeline.social_auth.auth_allowed',
+#     'social_core.pipeline.social_auth.social_user',
+#     'social_core.pipeline.user.get_username',
+#     'social_core.pipeline.user.create_user',
+#     'social_core.pipeline.social_auth.associate_user',
+#     'social_core.pipeline.social_auth.load_extra_data',
+#     'your_app.pipeline.google_extra_data_pipeline',  # Add your pipeline function
+#     'social_core.pipeline.user.user_details',  # This line includes user_details
+# )
 ROOT_URLCONF = "Senti_Backend.urls"
 AUTH_USER_MODEL = "core.User"
 
@@ -77,8 +92,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'social_django.context_processors.backends', #add
-                'social_django.context_processors.login_redirect', #add
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -116,19 +131,36 @@ DATABASES = {
         'NAME': 'sentireplica',       # Replace with your actual database name
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
-        # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
-        'HOST':'0.0.0.0',
+        'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        # 'HOST':'0.0.0.0',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
 ALLOWED_PROVIDERS = ["*"]
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': 'social_auth.log',  # Change this to your desired log file path
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
         'drf_social_oauth2.authentication.SocialAuthentication',
-
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
 
         # Other authentication classes if needed
     ],
@@ -141,13 +173,15 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 5,
+    
 }
 
 AUTHENTICATION_BACKENDS = (
     # drf-social-oauth2
-    # 'social_core.backends.google.GoogleOAuth2',
-    'drf_social_oauth2.backends.GoogleIdentityBackend',
+    # 'drf_social_oauth2.backends.GoogleIdentityBackend',
 
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
     'drf_social_oauth2.backends.DjangoOAuth2',
 
     # Django
@@ -162,7 +196,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET="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"
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
-    'openid',
+    # 'openid',
 
 ]
 CORS_ALLOW_CREDENTIALS = True

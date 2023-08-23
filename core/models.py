@@ -20,7 +20,7 @@ class User(AbstractUser):
     # phone_number = models.CharField(validators=[phone_regex], max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
     # otp = models.CharField(max_length=6, null=True, blank=True)
-
+    google_extra_data =models.TextField(null=True, blank=True)
     objects = CustomUserManager()
     # USERNAME_FIELD="email"
     # REQUIRED_FIELDS=[]
@@ -36,8 +36,6 @@ User._meta.get_field('user_permissions').remote_field.related_name = 'user_repli
 
 
 
-class CustomApplication(AbstractApplication):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class scanTable(models.Model):

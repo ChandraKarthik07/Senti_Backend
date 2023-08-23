@@ -63,3 +63,13 @@ def transform_json(json_data):
         }
         result.append(entry)
     return result
+
+def fetch_google_user_data(access_token):
+    url = 'https://www.googleapis.com/oauth2/v1/userinfo'
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
