@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from oauth2_provider import settings as oauth2_settings
 
 from pathlib import Path
 from datetime import timedelta
@@ -131,8 +132,8 @@ DATABASES = {
         'NAME': 'sentireplica',       # Replace with your actual database name
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
-        'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
-        # 'HOST':'0.0.0.0',
+        # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        'HOST':'0.0.0.0',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
@@ -253,3 +254,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# expires in 6 months
+oauth2_settings.DEFAULTS['ACCESS_TOKEN_EXPIRE_SECONDS'] = 1.577e7
