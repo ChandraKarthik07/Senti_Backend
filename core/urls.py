@@ -8,6 +8,7 @@ urlpatterns = [
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('monthlystats/<str:scan_id>/', MonthlyStatsAPIView.as_view(), name='monthlystats'),
     path('videostats/<str:scan_id>/', VideoStatsAPIView.as_view(), name='videostats'),
+    path('oauth2/convert-token/', CustomConvertTokenView.as_view(), name='convert_token'),
 ]
 
 urlpatterns += [

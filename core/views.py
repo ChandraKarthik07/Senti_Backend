@@ -1,24 +1,31 @@
+import logging
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
-from django.db.models import Prefetch
 from rest_framework import status
 from .models import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-import uuid,hashlib
+import hashlib
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope ,OAuth2Authentication
 from .tests import *
-from .serializers import  *
+from .serializers import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
-User=get_user_model()
+User = get_user_model() 
+from drf_social_oauth2.views import ConvertTokenView as OAuthConvertTokenView
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST,HTTP_200_OK
+from oauth2_provider.models import AccessToken
+
+logger = logging.getLogger(__name__)
+
 
 def home(request):
     return HttpResponse("Hello, karthik")
@@ -49,12 +56,13 @@ class UserSignupView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class GenerateScanView(APIView):
     def get(self, request):
         # Get user_uuid and channel_name from query parameters
         user_uuid = request.GET.get("user_uuid")
         channel_name = request.GET.get("channel_name")
-        print(user_uuid,channel_name)
+        print(user_uuid, channel_name)
         # Check if user_uuid and channel_name are provided
         if not user_uuid or not channel_name:
             return Response({"error": "user_uuid and channel_name are required."}, status=400)
@@ -67,7 +75,7 @@ class GenerateScanView(APIView):
             return Response({"error": "User not found with the provided user_uuid."}, status=404)
 
         # Generate a scan_id UUID
-        k=timezone.now()
+        k = timezone.now()
         text_to_hash = channel_name+str(k)
         hashed_value = hashlib.sha256(text_to_hash.encode()).hexdigest()[:10]
 
@@ -84,10 +92,13 @@ class GenerateScanView(APIView):
             "scan_id": hashed_value
         }
         scrape_channel(channel_name, hashed_value)
-        return Response(response_data)   
+        return Response(response_data)
 
 
 class ChannelInfoAPIView(APIView):
+    # Assuming you have defined this backend
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
     def get(self, request, scan_id, format=None):
         try:
             channel = Channels.objects.get(scan_id=scan_id)
@@ -109,7 +120,8 @@ class ChannelInfoAPIView(APIView):
 class MonthlyStatsAPIView(APIView):
     def get(self, request, scan_id):
         try:
-            monthly_stats = Monthlystats.objects.filter(channel__scan_id=scan_id)
+            monthly_stats = Monthlystats.objects.filter(
+                channel__scan_id=scan_id)
             serializer = MonthlystatsSerializer(monthly_stats, many=True)
             ready_to_plot = process_data(serializer.data)
             return Response(ready_to_plot)
@@ -118,7 +130,7 @@ class MonthlyStatsAPIView(APIView):
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        
+
 class VideoStatsAPIView(APIView):
     def get(self, request, scan_id):
         try:
@@ -130,5 +142,26 @@ class VideoStatsAPIView(APIView):
             return Response({"message": "Video stats not found for the given scan_id."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-##change
+
+# change
+
+
+class CustomConvertTokenView(OAuthConvertTokenView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        # Modify the response content or add user information
+        if response.status_code == HTTP_200_OK:
+            data = response.data
+            access_token = data.get('access_token')
+            if access_token:
+                try:
+                    access_token_obj = AccessToken.objects.get(token=access_token)
+                    print(access_token)
+                    user = access_token_obj.user_id
+
+                    data['uuid'] = user.hex
+                except AccessToken.DoesNotExist:
+                    pass
+
+        return response

@@ -132,8 +132,8 @@ DATABASES = {
         'NAME': 'sentireplica',       # Replace with your actual database name
         'USER': 'admin',       # Replace with your PostgreSQL username
         'PASSWORD': 'admin',   # Replace with your PostgreSQL password
-        'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
-        # 'HOST':'0.0.0.0',
+        # 'HOST': '100.100.151.14',               # Replace with your PostgreSQL host (usually 'localhost')
+        'HOST':'0.0.0.0',
         'PORT': '3307',                    # Replace with your PostgreSQL port (usually 5432)
     }
 }
@@ -156,12 +156,24 @@ ALLOWED_PROVIDERS = ["*"]
 #         },
 #     },
 # }
+AUTHENTICATION_BACKENDS = (
+    # drf-social-oauth2
+    # 'drf_social_oauth2.backends.GoogleIdentityBackend',
 
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
-        'drf_social_oauth2.authentication.SocialAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',  # Add TokenAuthentication
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",  # django-oauth-toolkit >= 1.0.0
+
+        "drf_social_oauth2.authentication.SocialAuthentication",
+
 
         # Other authentication classes if needed
     ],
@@ -177,17 +189,7 @@ REST_FRAMEWORK = {
     
 }
 
-AUTHENTICATION_BACKENDS = (
-    # drf-social-oauth2
-    # 'drf_social_oauth2.backends.GoogleIdentityBackend',
 
-    'social_core.backends.google.GoogleOAuth2',
-    # drf-social-oauth2
-    'drf_social_oauth2.backends.DjangoOAuth2',
-
-    # Django
-    'django.contrib.auth.backends.ModelBackend',
-)
 # CSRF_FAILURE_VIEW = 'core.views.csrf_failure_view'  # Customize the view for CSRF failure
 
 
@@ -236,7 +238,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 
