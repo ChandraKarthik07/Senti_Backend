@@ -136,8 +136,8 @@ class VideoStatsAPIView(APIView):
         try:
             videostats = Videostats.objects.filter(channel__scan_id=scan_id)
             serializer = VideoStatsSerializer(videostats, many=True)
-            # ready_to_plot=process_videostats(serializer.data)
-            return Response(serializer.data)
+            ready_to_plot=process_videostats(serializer.data)
+            return Response(ready_to_plot)
         except Videostats.DoesNotExist:
             return Response({"message": "Video stats not found for the given scan_id."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

@@ -48,21 +48,21 @@ def process_data(rawData):
 
     return processed_data
 
-def transform_json(json_data):
-    result = []
-    for item in json_data:
-        entry = {
-            "Category": item["category"],
-            "Channel ID": item["snippet"]["channelId"],
-            "Video ID": item["snippet"]["resourceId"]["videoId"],
-            "Date": item["snippet"]["publishedAt"],
-            "Title": item["snippet"]["title"],
-            "View Count": item["statistics"]["viewCount"],
-            "Like Count": item["statistics"]["likeCount"],
-            "Comment Count": item["statistics"]["commentCount"]
-        }
-        result.append(entry)
-    return result
+# def transform_json(json_data):
+#     result = []
+#     for item in json_data:
+#         entry = {
+#             "Category": item["category"],
+#             "Channel ID": item["snippet"]["channelId"],
+#             "Video ID": item["snippet"]["resourceId"]["videoId"],
+#             "Date": item["snippet"]["publishedAt"],
+#             "Title": item["snippet"]["title"],
+#             "View Count": item["statistics"]["viewCount"],
+#             "Like Count": item["statistics"]["likeCount"],
+#             "Comment Count": item["statistics"]["commentCount"]
+#         }
+#         result.append(entry)
+#     return result
 
 def fetch_google_user_data(access_token):
     url = 'https://www.googleapis.com/oauth2/v1/userinfo'
@@ -73,3 +73,107 @@ def fetch_google_user_data(access_token):
         return response.json()
     else:
         return None
+
+
+# def process_videostats(data):
+#     df = pd.DataFrame(data)
+#     df.rename(columns={
+#         "video_stats_id": "index",
+#         "vid_id": "Video ID",
+#         "date": "Date",
+#         "vid_title": "Title",
+#         "vid_view_cnt": "View Count",
+#         "vid_like_cnt": "Like Count",
+#         "vid_comment_cnt": "Comment Count",
+#         "category": "Category",
+#         "channel": "Channel ID"
+#     }, inplace=True)
+#     one_two=get_one_two(df)
+#     three_four=get_three_four(df)
+#     combined_response = {
+#         'Latest_20_videos':data,
+#         'one_two': one_two,
+#         'three_four': three_four
+#     }
+#     return combined_response
+
+
+# def get_one_two(df):
+#     df['Date'] = pd.to_datetime(df['Date'])
+#     df['Week'] = df['Date'].dt.strftime('%Y-%U')
+#     df['Month'] = df['Date'].dt.to_period('M')
+    
+#     videos_per_week = df.groupby('Week')['Category'].count().reset_index()
+#     videos_per_month = df.groupby('Month')['Category'].count().reset_index()
+#     videos_per_month['Month'] = videos_per_month['Month'].astype(str)
+    
+#     plot_data = {
+#         'videos_per_week': videos_per_week.to_dict(orient='records'),
+#         'videos_per_month': videos_per_month.to_dict(orient='records'),
+#     }
+#     return plot_data
+
+# def get_three_four(data):
+#     # Convert numeric columns to numeric types
+#     # numeric_columns = ['View Count', 'Like Count', 'Comment Count']
+#     # data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, errors='coerce')
+    
+#     # Calculate Engagement Rate
+#     data['Engagement Rate'] = (data['Like Count'] + data['Comment Count']) / data['View Count']
+    
+#     # Sort DataFrame by 'View Count' in descending order
+#     sorted_df = data.sort_values(by='View Count', ascending=False)
+    
+#     # Prepare data for the first bar plot
+#     bar_plot_data = sorted_df.head(10)[['View Count', 'Title']]
+    
+#     # Prepare data for the second line plot
+#     line_plot_data = sorted_df.head(10)[['View Count', 'Like Count', 'Title']]
+    
+#     return {
+#         'bar_plot_data': bar_plot_data.to_dict(orient='records'),
+#         'line_plot_data': line_plot_data.to_dict(orient='records')
+#     }
+
+
+def process_videostats(data):
+    df = pd.DataFrame(data)
+    df.rename(columns={
+        "video_stats_id": "index",
+        "vid_id": "Video ID",
+        "date": "Date",
+        "vid_title": "Title",
+        "vid_view_cnt": "View Count",
+        "vid_like_cnt": "Like Count",
+        "vid_comment_cnt": "Comment Count",
+        "category": "Category",
+        "channel": "Channel ID"
+    }, inplace=True)
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Week'] = df['Date'].dt.strftime('%Y-%U')
+    df['Month'] = df['Date'].dt.to_period('M')
+    videos_per_week = df.groupby('Week')['Category'].count().reset_index()
+    videos_per_month = df.groupby('Month')['Category'].count().reset_index()
+    videos_per_month['Month'] = videos_per_month['Month'].astype(str)
+    
+
+    # Calculate Engagement Rate
+    df['Engagement Rate'] = (df['Like Count'] + df['Comment Count']) / df['View Count']
+    
+    # Sort DataFrame by 'View Count' in descending order
+    sorted_df = df.sort_values(by='View Count', ascending=False)
+    
+    # Prepare data for the first bar plot
+    bar_plot_data = sorted_df.head(10)[['View Count', 'Title']]
+    
+    # Prepare data for the second line plot
+    line_plot_data = sorted_df.head(10)[['View Count', 'Like Count', 'Title']]
+    
+    combined_response = {
+        'Latest_20_videos': data,
+        'videos_per_week': videos_per_week.to_dict(orient='records'),
+        'videos_per_month': videos_per_month.to_dict(orient='records'),        
+        'bar_plot_data': bar_plot_data.to_dict(orient='records'),
+        'line_plot_data': line_plot_data.to_dict(orient='records')
+    }
+    return combined_response
