@@ -25,6 +25,7 @@ jobs:
           password: 7122
           script: |
             cd /home/sasi/Senti-Backend
+            git stash 
             git pull origin main
           
 
