@@ -151,29 +151,42 @@ def process_videostats(data):
     }, inplace=True)
     df['Date'] = pd.to_datetime(df['Date'])
     df['Week'] = df['Date'].dt.strftime('%Y-%U')
-    df['Month'] = df['Date'].dt.to_period('M')
+    # df['Month'] = df['Month'].astype(str)
+
+    df['Month'] = df['Date'].dt.to_period('M').astype(str)  # Convert 'Month' to Period and then to string
+    
     videos_per_week = df.groupby('Week')['Category'].count().reset_index()
     videos_per_month = df.groupby('Month')['Category'].count().reset_index()
     videos_per_month['Month'] = videos_per_month['Month'].astype(str)
-    
 
     # Calculate Engagement Rate
     df['Engagement_Rate'] = (df['Like_Count'] + df['Comment_Count']) / df['View_Count']
     
-    # Sort DataFrame by 'View Count' in descending order
-    sorted_df = df.sort_values(by='View_Count', ascending=False)
+    # Calculate Word Count
+    df['Word_Count'] = [len(title.split()) for title in df['Title']]
+
     
+    # Sort DataFrame by 'View Count' in descending order
+    sorted_df = df.sort_values(by=['View_Count','Engagement_Rate'], ascending=False)
     # Prepare data for the first bar plot
     bar_plot_data = sorted_df.head(10)[['View_Count', 'Title']]
     
     # Prepare data for the second line plot
     line_plot_data = sorted_df.head(10)[['View_Count', 'Like_Count', 'Title']]
-    
-    combined_response = {
-        'Latest_20_videos': data,
+
+    processed_data_highestrated = sorted_df[sorted_df['Category'] == 'highestrated']
+    processed_data_latest = sorted_df[sorted_df['Category'] == 'latest']
+    processed_data_mostviewed = sorted_df[sorted_df['Category'] == 'mostviewed']
+
+    response = {
+        'highestrated': processed_data_highestrated.to_dict(orient='records'),
+        'latest': processed_data_latest.to_dict(orient='records'),
+        'mostviewed': processed_data_mostviewed.to_dict(orient='records'),
         'videos_per_week': videos_per_week.to_dict(orient='records'),
-        'videos_per_month': videos_per_month.to_dict(orient='records'),        
+        'videos_per_month': videos_per_month.to_dict(orient='records'),
         'bar_plot_data': bar_plot_data.to_dict(orient='records'),
         'line_plot_data': line_plot_data.to_dict(orient='records')
     }
-    return combined_response
+    
+    # Send the response to the frontend using JSON
+    return response
