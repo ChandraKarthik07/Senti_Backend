@@ -140,14 +140,14 @@ def process_videostats(data):
     df = pd.DataFrame(data)
     df.rename(columns={
         "video_stats_id": "index",
-        "vid_id": "Video ID",
+        "vid_id": "Video_ID",
         "date": "Date",
         "vid_title": "Title",
-        "vid_view_cnt": "View Count",
-        "vid_like_cnt": "Like Count",
-        "vid_comment_cnt": "Comment Count",
+        "vid_view_cnt": "View_Count",
+        "vid_like_cnt": "Like_Count",
+        "vid_comment_cnt": "Comment_Count",
         "category": "Category",
-        "channel": "Channel ID"
+        "channel": "Channel_ID"
     }, inplace=True)
     df['Date'] = pd.to_datetime(df['Date'])
     df['Week'] = df['Date'].dt.strftime('%Y-%U')
@@ -158,16 +158,16 @@ def process_videostats(data):
     
 
     # Calculate Engagement Rate
-    df['Engagement Rate'] = (df['Like Count'] + df['Comment Count']) / df['View Count']
+    df['Engagement_Rate'] = (df['Like_Count'] + df['Comment_Count']) / df['View_Count']
     
     # Sort DataFrame by 'View Count' in descending order
-    sorted_df = df.sort_values(by='View Count', ascending=False)
+    sorted_df = df.sort_values(by='View_Count', ascending=False)
     
     # Prepare data for the first bar plot
-    bar_plot_data = sorted_df.head(10)[['View Count', 'Title']]
+    bar_plot_data = sorted_df.head(10)[['View_Count', 'Title']]
     
     # Prepare data for the second line plot
-    line_plot_data = sorted_df.head(10)[['View Count', 'Like Count', 'Title']]
+    line_plot_data = sorted_df.head(10)[['View_Count', 'Like_Count', 'Title']]
     
     combined_response = {
         'Latest_20_videos': data,
