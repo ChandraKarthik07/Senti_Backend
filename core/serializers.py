@@ -40,12 +40,10 @@ class MonthlystatsSerializer(serializers.ModelSerializer):
         model = Monthlystats
         fields = '__all__'
 
-
 class VideoStatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Videostats
         fields = '__all__'
-
 
 class CustomConvertTokenView(ConvertTokenView):
     def post(self, request, *args, **kwargs):
